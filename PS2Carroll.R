@@ -110,13 +110,12 @@ print.benfords <- function(data.matrix, M=TRUE, D=TRUE){
 #     that satisfies Benford's Law. 
 #   dataset2 should be a vector, matrix, or dataframe object. In this example it is the dataset 
 #     that does not satsify Benford's Law.
-#   true.values1 is a list of length 3. The first element of this list is a vector
+#   true.values1 is a list of length 3. The first element is itself a list whose elements are vectors; each vector contains 
+#     the digit distribution for each column of dataset1. The second element of true.values1 is a vector
 #     containing the true Leemis statistics that would be calculated if the function is working
 #     properly. The elements of this vector should go in the same order as the columns of dataset1. 
 #     The second element of the list should be a vector containing the true ChoGains statistics. 
 #     Again the elements of the vector should go in the same order as the columns of dataset1. 
-#     Finally, the third element is itself a list whose elements are vectors; each vector contains 
-#     the digit distribution for each column of dataset1.
 #   true.values2 is the same as true.values1, except for dataset2
 
 unit.test <- function(dataset1, dataset2, true.values1, true.values2){
@@ -140,49 +139,53 @@ unit.test <- function(dataset1, dataset2, true.values1, true.values2){
     ChoGains2[i] <- stored.output2[[i]]$ChoGains
     DigitDistribution2[[i]] <- stored.output2[[i]]$sigDigitFreq
   }
+
+# Next chunk creates 3 objects, each of which is a single logical testing whether the 2 statistics or 
+# digit distribution are equal to their true values
   
-  
-  #Next chunk creates 3 objects, each of which is a single logical testing whether the 2 statistics or 
-  #digit distribution are equal to their true values
-  if(all(Leemis1==true.values1[[1]])){ #IF every Leemis statistic for dataset1 matches the true Leemis value...
-    test1.Leemis <- TRUE
-  } else(test1.Leemis <- FALSE)
-  if(all(ChoGains1==true.values1[[2]])){ #IF every ChoGains statistic for dataset1 matches the true ChoGains value...
-    test1.ChoGains <- TRUE
-  } else(test1.ChoGains <- FALSE)
   digit.logical1 <- logical(length=length(stored.output1))
-  for(i in 1:length(stored.output1)){
-    if(all(DigitDistribution1[[i]]==true.values1[[3]][[i]])){ 
+  for(i in 1:length(digit.logical1)){
+    if(all(DigitDistribution1[[i]]==true.values1[[1]][[i]])){ 
       digit.logical1[i] <- TRUE
     }
   }
   if(all(digit.logical1)){
     test1.distribution <- TRUE
   } else(test1.distribution <- FALSE)
+  
+  if(all(Leemis1==true.values1[[2]])){ #IF every Leemis statistic for dataset1 matches the true Leemis value...
+    test1.Leemis <- TRUE
+  } else(test1.Leemis <- FALSE)
+  if(all(ChoGains1==true.values1[[3]])){ #IF every ChoGains statistic for dataset1 matches the true ChoGains value...
+    test1.ChoGains <- TRUE
+  } else(test1.ChoGains <- FALSE)
+# NOW test to make sure they're all TRUE
   if(test1.Leemis==TRUE & test1.ChoGains==TRUE & test1.distribution==TRUE){
     test1 <- TRUE
   } else(test1 <- FALSE)
 
 
-  if(all(Leemis2==true.values2[[1]])){ #IF every Leemis statistic for dataset2 matches the true Leemis value...
-    test2.Leemis <- TRUE
-  } else(test2.Leemis <- FALSE)
-  if(all(ChoGains2==true.values2[[2]])){ #IF every ChoGains statistic for dataset2 matches the true ChoGains value...
-    test2.ChoGains <- TRUE
-  } else(test2.ChoGains <- FALSE)
+# Next, same ideas as above except for dataset2
   digit.logical2 <- logical(length=length(stored.output2))
-  for(i in 1:length(stored.output2)){
-    if(all(DigitDistribution2[[i]]==true.values2[[3]][[i]])){ 
-      digit.logical2[i] <- TRUE
-    }
+  for(i in 1:length(digit.logical2)){
+     if(all(DigitDistribution2[[i]]==true.values2[[1]][[i]])){ 
+       digit.logical2[i] <- TRUE
+      }
   }
   if(all(digit.logical2)){
-    test2.distribution <- TRUE
+     test2.distribution <- TRUE
   } else(test2.distribution <- FALSE)
+  if(all(Leemis2==true.values2[[2]])){ #IF every Leemis statistic for dataset2 matches the true Leemis value...
+    test2.Leemis <- TRUE
+  } else(test2.Leemis <- FALSE)
+  if(all(ChoGains2==true.values2[[3]])){ #IF every ChoGains statistic for dataset2 matches the true ChoGains value...
+    test2.ChoGains <- TRUE
+  } else(test2.ChoGains <- FALSE)
   if(test2.Leemis==TRUE & test2.ChoGains==TRUE & test2.distribution==TRUE){
     test2 <- TRUE
   } else(test2 <- FALSE)
 
+#Finally create final output of TRUE/FALSE
   final.output <- list(test1, test2)
   return(final.output)
 }
@@ -192,16 +195,13 @@ testing1 <- c(1, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 7, 7, 7, 8, 9)
 dis1 <- c(0.05, 0.05, 0.15, 0.15, 0.2, 0.15, 0.15, 0.05, 0.05) #Gives distribution for 1st test
 Leemis.test1 <- sqrt(20)*max(dis1 - log(1 + (1/(1:9)), base=10)) #gives Leemis for 1st test; value is 0.5403179
 ChoGains.test1 <- sqrt(20)*sqrt(sum((dis1 - log(1 + (1/(1:9)), base=10))^2)) #gives ChoGains for 1st test; value is 1.498943
-true.values.list1 <- list(Leemis.test1, ChoGains.test1, dis1)
-
+true.values.list1 <- list(list(dis1), Leemis.test1, ChoGains.test1)
 
 testing2 <- c(6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 9, 9, 9, 9)
 dis2 <- c(0, 0, 0, 0, 0, 0.25, 0.3, 0.25, 0.2) #gives distribution for 2nd test
 Leemis.test2 <- sqrt(20)*max(dis2 - log(1 + (1/(1:9)), base=10)) #gives value 1.082293
 ChoGains.test2 <- sqrt(20)*sqrt(sum((dis2 - log(1 + (1/(1:9)), base=10))^2)) #gives value 2.483165
-true.values.list2 <- list(Leemis.test2, ChoGains.test2, dis2)
+true.values.list2 <- list(list(dis2), Leemis.test2, ChoGains.test2)
 
 
 unit.test(dataset1=testing1, dataset2=testing2, true.values1=true.values.list1, true.values2=true.values.list2)
-BenfordsLaw(data=testing1, M=TRUE, D=TRUE)
-
