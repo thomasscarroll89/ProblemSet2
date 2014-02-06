@@ -119,30 +119,36 @@ print.benfords <- function(data.matrix, M=TRUE, D=TRUE){
 #   true.values2 is the same as true.values1, except for dataset2
 
 unit.test <- function(dataset1, dataset2, true.values1, true.values2){
-  stored.output1 <- BenfordsLaw(data=dataset1, M=TRUE, D=TRUE)
+# Calculate the statistics and distributions using my functions  
+  stored.output1 <- BenfordsLaw(data=dataset1, M=TRUE, D=TRUE) 
   stored.output2 <- BenfordsLaw(data=dataset2, M=TRUE, D=TRUE)
+# Turn dataframes or vectors into matrices
   dataset1 <- as.matrix(dataset1)
   dataset2 <- as.matrix(dataset2)
+# Create empty objects to store info into later
   Leemis1 <- numeric(length(stored.output1))
   ChoGains1 <- numeric(length(stored.output1))
   DigitDistribution1 <- vector("list", length=length(stored.output1))
   Leemis2 <- numeric(length(stored.output2))
   ChoGains2 <- numeric(length(stored.output2))
   DigitDistribution2 <- vector("list", length=length(stored.output2))
+# Calculate Leemis, ChoGains, and Digit Distribution for dataset1  
   for(i in 1:ncol(dataset1)){
     Leemis1[i] <- stored.output1[[i]]$Leemis
     ChoGains1[i] <- stored.output1[[i]]$ChoGains 
     DigitDistribution1[[i]] <- stored.output1[[i]]$sigDigitFreq
   }
+# Calculate Leemis, ChoGains, and Digit Distribution for dataset2
   for(i in 1:ncol(dataset2)){
     Leemis2[i] <- stored.output2[[i]]$Leemis
     ChoGains2[i] <- stored.output2[[i]]$ChoGains
     DigitDistribution2[[i]] <- stored.output2[[i]]$sigDigitFreq
   }
 
-# Next chunk creates 3 objects, each of which is a single logical testing whether the 2 statistics or 
-# digit distribution are equal to their true values
-  
+# Next chunk creates 3 objects: (1) test1.distribution; (2) test1.Leemis; and (3) test1.ChoGains. 
+# Each of these is a single logical (T/F) testing whether the 2 statistics and/or digit distribution 
+# are equal to their true values
+# First test whether the digit distributions are correct
   digit.logical1 <- logical(length=length(stored.output1))
   for(i in 1:length(digit.logical1)){
     if(all(DigitDistribution1[[i]]==true.values1[[1]][[i]])){ 
@@ -152,18 +158,17 @@ unit.test <- function(dataset1, dataset2, true.values1, true.values2){
   if(all(digit.logical1)){
     test1.distribution <- TRUE
   } else(test1.distribution <- FALSE)
-  
+#Next test if the Leemis and ChoGains values are correct   
   if(all(Leemis1==true.values1[[2]])){ #IF every Leemis statistic for dataset1 matches the true Leemis value...
     test1.Leemis <- TRUE
   } else(test1.Leemis <- FALSE)
   if(all(ChoGains1==true.values1[[3]])){ #IF every ChoGains statistic for dataset1 matches the true ChoGains value...
     test1.ChoGains <- TRUE
   } else(test1.ChoGains <- FALSE)
-# NOW test to make sure they're all TRUE
+# NOW test to make sure all three logicals are TRUE
   if(test1.Leemis==TRUE & test1.ChoGains==TRUE & test1.distribution==TRUE){
     test1 <- TRUE
   } else(test1 <- FALSE)
-
 
 # Next, same ideas as above except for dataset2
   digit.logical2 <- logical(length=length(stored.output2))
@@ -185,23 +190,47 @@ unit.test <- function(dataset1, dataset2, true.values1, true.values2){
     test2 <- TRUE
   } else(test2 <- FALSE)
 
+# Generate warning messages which tell user which statistic is being calculated incorrectly
+  if(test1.distribution==FALSE){
+    warning("Benford Distribution for Dataset1 is Incorrect")
+  }
+  if(test2.distribution==FALSE){
+    warning("Benford Distribution for Dataset2 is Incorrect")
+  }
+  if(test1.Leemis==FALSE | test1.ChoGains==FALSE){
+    warning("Leemis and ChoGains statistics for Dataset1 are Incorrect")
+  }
+  if(test2.Leemis==FALSE | test2.ChoGains==FALSE){
+    warning("Leemis and ChoGains statistics for Dataset2 are Incorrect")
+  }
+
 #Finally create final output of TRUE/FALSE
   final.output <- list(test1, test2)
   return(final.output)
 }
 
 
+
+# NEXT I test my function using two self-created datasets. The first dataset is called testing1. It
+# is a single vecctor, 20 elements long. I calculated by hand the digit distribution and stored it as 
+# an object valled dis1. I then calculated (using R) the Leemis and ChoGains statistics. Their values 
+# are recorded below. Finally I plug these into a list object to plug in as one of the arguments to 
+# my unit.test function. 
 testing1 <- c(1, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 7, 7, 7, 8, 9)
 dis1 <- c(0.05, 0.05, 0.15, 0.15, 0.2, 0.15, 0.15, 0.05, 0.05) #Gives distribution for 1st test
 Leemis.test1 <- sqrt(20)*max(dis1 - log(1 + (1/(1:9)), base=10)) #gives Leemis for 1st test; value is 0.5403179
 ChoGains.test1 <- sqrt(20)*sqrt(sum((dis1 - log(1 + (1/(1:9)), base=10))^2)) #gives ChoGains for 1st test; value is 1.498943
 true.values.list1 <- list(list(dis1), Leemis.test1, ChoGains.test1)
 
+# Same thing below, except this is for dataset2 (which I call testing2). 
 testing2 <- c(6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 9, 9, 9, 9)
 dis2 <- c(0, 0, 0, 0, 0, 0.25, 0.3, 0.25, 0.2) #gives distribution for 2nd test
 Leemis.test2 <- sqrt(20)*max(dis2 - log(1 + (1/(1:9)), base=10)) #gives value 1.082293
 ChoGains.test2 <- sqrt(20)*sqrt(sum((dis2 - log(1 + (1/(1:9)), base=10))^2)) #gives value 2.483165
 true.values.list2 <- list(list(dis2), Leemis.test2, ChoGains.test2)
 
-
+#Finally I run my unit.test function. As we can see, it returns all TRUE values because my function is 
+# working correctly. 
 unit.test(dataset1=testing1, dataset2=testing2, true.values1=true.values.list1, true.values2=true.values.list2)
+
+
