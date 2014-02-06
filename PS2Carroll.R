@@ -233,5 +233,8 @@ true.values.list2 <- list(list(dis2), Leemis.test2, ChoGains.test2)
 # working correctly. 
 unit.test(dataset1=testing1, dataset2=testing2, true.values1=true.values.list1, true.values2=true.values.list2)
 
+
+#Last, I do the second part of question 3 by purposefully including erroneous values for the true.values objects. 
+#Below I show what my function does when the distribution for dataset1 is calculated incorrectly. 
 true.values.list1.1 <- list(list(c(1)), Leemis.test1, ChoGains.test1)
 unit.test(dataset1=testing1, dataset2=testing2, true.values1=true.values.list1.1, true.values2=true.values.list2)
