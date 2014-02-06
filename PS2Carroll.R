@@ -233,5 +233,9 @@ true.values.list2 <- list(list(dis2), Leemis.test2, ChoGains.test2)
 # working correctly. 
 unit.test(dataset1=testing1, dataset2=testing2, true.values1=true.values.list1, true.values2=true.values.list2)
 
-true.values.list1.3 <- list(list(dis1), -1, -1)
-unit.test(dataset1=testing1, dataset2=testing2, true.values1=true.values.list1.3, true.values2=true.values.list2)
+
+#For the last part of problem 3, I purposefully include erroneous answers to the true.values objects
+#so we can see how my function reacts. Below I show what happens when the Leemis and choGains statistics
+#are set to the wrong value for dataset2. 
+true.values.list2.3 <- list(list(dis2), -1, -1)
+unit.test(dataset1=testing1, dataset2=testing2, true.values1=true.values.list1, true.values2=true.values.list2.3)
