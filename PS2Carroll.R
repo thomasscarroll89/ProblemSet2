@@ -233,5 +233,5 @@ true.values.list2 <- list(list(dis2), Leemis.test2, ChoGains.test2)
 # working correctly. 
 unit.test(dataset1=testing1, dataset2=testing2, true.values1=true.values.list1, true.values2=true.values.list2)
 
-true.values.list2.1 <- list(list(c(1)), Leemis.test1, ChoGains.test1)
-unit.test(dataset1=testing1, dataset2=testing2, true.values1=true.values.list1, true.values2=true.values.list2.1)
+true.values.list1.3 <- list(list(dis1), -1, -1)
+unit.test(dataset1=testing1, dataset2=testing2, true.values1=true.values.list1.3, true.values2=true.values.list2)
